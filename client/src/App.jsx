@@ -1,38 +1,16 @@
-import { useState } from "react"
-
+import Connexion from "./pages/Connexion"
+import Navbar from "./components/Navbar"
+import { BrowserRouter, Routes, Route } from "react-router-dom"
 
 function App() {
-  const [email, setEmail] = useState("")
-  const [password, setPassword] = useState("")
-
-  async function handleSubmit(e) {
-    e.preventDefault()
-    console.log(email, password)
-    const repsonse = await fetch('http://localhost:3000/login-localstorage', {
-      method: 'POST',
-      headers: {
-        "Content-Type": "application/json"
-      },
-      body: JSON.stringify({ email, password })
-    })
-    console.log(response)
-    const data = await repsonse.json()
-    localStorage.setItem('token', data.token)
-    console.log(data)
-  }
   return (
     <>
-      <form>
-        <input
-          type="email"
-          placeholder="Email..."
-          onChange={(e) => setEmail(e.target.value)} />
-        <input
-          type="password"
-          placeholder="Mot de passe..."
-          onChange={(e) => setPassword(e.target.value)} />
-        <button>Connexion</button>
-      </form>
+      <BrowserRouter>
+        <Navbar />
+        <Routes>
+          <Route path="" element={<App />} />
+        </Routes>
+      </BrowserRouter>
     </>
   )
 }
