@@ -1,9 +1,6 @@
 import express from 'express'
 import mongoose from 'mongoose'
-
-//Import du dotenv
 import dotenv from 'dotenv'
-//Inject methode config pour acceder au variable
 dotenv.config()
 
 import cors from 'cors'
@@ -11,8 +8,8 @@ import cors from 'cors'
 import authRoute from './routes/auth.route.js'
 
 const app = express()
-app.use(cors({ origin: "http://localhost:5173" }))
 app.use(express.json())
+app.use(cors())
 
 app.use('', authRoute)
 

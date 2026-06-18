@@ -7,6 +7,7 @@ function App() {
 
   async function handleSubmit(e) {
     e.preventDefault()
+    console.log(email, password)
     const repsonse = await fetch('http://localhost:3000/login-localstorage', {
       method: 'POST',
       headers: {

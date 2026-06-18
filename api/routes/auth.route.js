@@ -13,19 +13,16 @@ router.post('/register', async (req, res) => {
             return res.status(400).json({ message: 'Cet utilisateur existe déjà' })
         }
         const hash = await bcrypt.hash(password, 10)
-        const newUser = {
-            username: username,
-            email: email,
-            password: hash
-        }
+
         await User.create({ username, email, password: hash })
-        res.status(201).json({ message: 'Utilisateur crée' })
+        res.status(201).json({ message: 'Utilisateur crée !' })
     } catch (err) {
         res.status(500).json({ message: err })
     }
 })
 
 router.post('/login-localstorage', async (req, res) => {
+    console.log(req.body)
     try {
         const { email, password } = req.body
         const user = await User.findOne({ email })
@@ -36,9 +33,10 @@ router.post('/login-localstorage', async (req, res) => {
         if (!isMatch) {
             return res.status(400).json({ message: 'Invalides identifiants' })
         }
-        const token = jwt.sign({ id: user._id, username: user.username }, process.env.JWT_SECRET, { expiresIn: '1h' })
+        const token = jwt.sign({ id: user._id, username: user.username }, process.env.JWT_SECRET)
         res.status(200).json({ token, message: 'Vous êtes connécté' })
     } catch (err) {
+        console.log(err)
         res.status(500).json({ message: err })
     }
 })
@@ -48,7 +46,7 @@ function verfyToken(req, res, next) {
         const authHeaders = req.headers.authorization
         const token = authHeaders.split(' ')[1]
         if (!token) {
-            return res.status(403).json({ message: 'Token manquant' })
+            return res.status(403).json({ message: 'Token manquant !' })
         }
         const decode = jwt.verify(token, process.env.JWT_SECRET)
         req.user = decode
