@@ -1,0 +1,33 @@
+@import "tailwindcss";
+@plugin "daisyui";
+
+main {
+    height: calc(100vh - 56px);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+form {
+    display: flex;
+    flex-direction: column;
+    width: 460px;
+    border: 2px solid black;
+    gap: 16px;
+    padding: 16px;
+}
+
+input,
+button,
+select {
+    border: 2px solid black;
+    padding: 8px;
+    border-radius: 5px;
+}
+
+
+nav {
+    background-color: rgb(161, 113, 159);
+    justify-content: space-between;
+    align-items: center;
+}

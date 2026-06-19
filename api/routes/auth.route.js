@@ -7,14 +7,15 @@ const router = express.Router()
 
 router.post('/register', async (req, res) => {
     try {
-        const { username, email, password } = req.body
+        const { username, email, password, role } = req.body
+        console.log(req.body)
         const user = await User.findOne({ email })
         if (user) {
             return res.status(400).json({ message: 'Cet utilisateur existe déjà' })
         }
         const hash = await bcrypt.hash(password, 10)
 
-        await User.create({ username, email, password: hash })
+        await User.create({ username, email, password: hash, role })
         res.status(201).json({ message: 'Utilisateur crée !' })
     } catch (err) {
         res.status(500).json({ message: err })
@@ -33,8 +34,8 @@ router.post('/login-localstorage', async (req, res) => {
         if (!isMatch) {
             return res.status(400).json({ message: 'Invalides identifiants' })
         }
-        const token = jwt.sign({ id: user._id, username: user.username }, process.env.JWT_SECRET)
-        res.status(200).json({ token, message: 'Vous êtes connécté' })
+        const token = jwt.sign({ id: user._id, username: user.username, role: user.role }, process.env.JWT_SECRET)
+        res.status(200).json({ token, role: user.role })
     } catch (err) {
         console.log(err)
         res.status(500).json({ message: err })
@@ -56,8 +57,17 @@ function verfyToken(req, res, next) {
     }
 }
 
-router.get('/protected', verfyToken, async (req, res) => {
-    res.status(200).json({ message: `Vous êtes sur une route protégée ${req.user.username}!` })
+router.get('/admin', verfyToken, async (req, res) => {
+    if (req.user.role !== "admin") {
+        return res.status(403).json({ message: "Accées refusé" })
+    }
+    const users = await User.find()
+    res.status(200).json(users)
+})
+
+router.get('/profile', verfyToken, async (req, res) => {
+    const user = await User.findById(req.user.id)
+    res.status(200).json(user)
 })
 
 export default router
