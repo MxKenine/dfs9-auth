@@ -2,6 +2,7 @@ import User from "../models/user.model.js"
 import bcrypt from 'bcrypt'
 import express from 'express'
 import jwt from 'jsonwebtoken'
+import verfyToken from "../middleware/verifyToken.js"
 
 const router = express.Router()
 
@@ -42,22 +43,42 @@ router.post('/login-localstorage', async (req, res) => {
     }
 })
 
-function verfyToken(req, res, next) {
+router.post('/login-cookie', async (req, res) => {
     try {
-        const authHeaders = req.headers.authorization
-        const token = authHeaders.split(' ')[1]
-        if (!token) {
-            return res.status(403).json({ message: 'Token manquant !' })
+        const { email, password } = req.body
+        if (!email || !password) {
+            return res.status(400).json({ message: "Les champs sont requis" })
         }
-        const decode = jwt.verify(token, process.env.JWT_SECRET)
-        req.user = decode
-        next()
+        const user = await User.findOne({ email })
+        if (!user) {
+            return res.status(400).json({ message: "Identifiants Invalides" })
+        }
+        const isMatch = await bcrypt.compare(password, user.password)
+        if (!isMatch) {
+            return res.status(400).json({ message: "Identifiants Invalides" })
+        }
+        const token = jwt.sign(
+            {
+                userID: user._id,
+                username: user.username,
+                role: user.role
+            },
+            process.env.JWT_SECRET,
+            { expiresIn: "2h" })
+        res.cookie('token', token, {
+            httpOnly: true,
+            secure: false,
+            maxAge: 3600 * 1000 * 2
+        })
+        res.status(200).json({ message: "Connexion réussie !" })
     } catch (err) {
         res.status(500).json({ message: err })
+
     }
-}
+})
 
 router.get('/admin', verfyToken, async (req, res) => {
+    console.log(req.user)
     if (req.user.role !== "admin") {
         return res.status(403).json({ message: "Accées refusé" })
     }

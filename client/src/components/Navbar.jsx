@@ -18,6 +18,7 @@ export default function Navbar() {
                 <Link to="/login">Login</Link>
                 <Link to="/cv">CV</Link>
                 <Link to="/contact">Contact</Link>
+                <Link to="/admin">Admin</Link>
             </div>
             {token
                 ? <button className='mr-4' onClick={logout}>Déconnexion</button>

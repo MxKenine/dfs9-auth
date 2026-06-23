@@ -2,6 +2,7 @@ import React from 'react'
 import { useState } from 'react'
 import { useNavigate, Link } from 'react-router-dom'
 
+const BASE_URL = "http://localhost:3000/login-cookie";
 export default function Login() {
     const navigate = useNavigate()
     const [email, setEmail] = useState("")
@@ -10,23 +11,28 @@ export default function Login() {
     async function handleSubmit(e) {
         e.preventDefault()
         try {
-            const repsonse = await fetch('http://localhost:3000/login-localstorage', {
+            const repsonse = await fetch(BASE_URL, {
                 method: 'POST',
                 headers: {
                     "Content-Type": "application/json"
                 },
-                body: JSON.stringify({ email, password })
+                body: JSON.stringify({ email, password }),
+                credentials: "include"
             })
+            if (!Response.ok) {
+                throw new Error('Forbiden')
+            }
             const data = await repsonse.json()
-            localStorage.setItem('token', data.token)
-            localStorage.setItem('role', data.role)
+            // localStorage.setItem('token', data.token)
+            // localStorage.setItem('role', data.role)
             console.log(data)
-            if (data.role === 'admin') {
-                navigate('/admin')
-            }
-            if (data.role === 'user') {
-                navigate('/profile')
-            }
+            navigate('/admin')
+            // if (data.role === 'admin') {
+            //     navigate('/admin')
+            // }
+            // if (data.role === 'user') {
+            //     navigate('/profile')
+            // }
         } catch (err) {
             console.log(err)
         }
